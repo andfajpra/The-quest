@@ -1,8 +1,9 @@
 #---Aquí crearemos las partidas y las distintas pantallas con el menú de inicio---
 
 import pygame as pg
-from the_quest.objetos import Nave
+from the_quest.objetos import Nave, Obstaculo, Balas
 from the_quest import ANCHO, ALTO, BLANCO, NARANJA, MAGENTA,NEGRO,FPS, FONDO
+from random import random
 
 class Partida:
     def __init__(self, pantalla, metronomo):
@@ -11,6 +12,9 @@ class Partida:
         pg.display.set_caption("THE QUEST")
 
         self.nave=Nave()
+        self.obstaculo=Obstaculo()
+        self.balas=Balas(75//2,75//2)
+
         
         self.nave.vy=5
         self.nave.vx=5
@@ -50,13 +54,18 @@ class Partida:
         
             
 
-    
+            self.nave.mover(pg.K_UP, pg.K_DOWN)
+            self.nave.moverlateral(pg.K_LEFT,pg.K_RIGHT)
+            self.obstaculo.actualizar()
+            self.balas.actualizar() 
+
 
             self.pantalla_principal.blit(self.fondoPantalla, (0, 0))
     
 
             self.nave.dibujar(self.pantalla_principal)
-          
+            self.obstaculo.dibujar(self.pantalla_principal)
+            self.balas.dibujar(self.pantalla_principal)
 
             """ 
             p1 = self.fuenteMarcador.render(str(self.puntuacion1), True, BLANCO)
