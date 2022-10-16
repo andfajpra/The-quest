@@ -1,7 +1,7 @@
 #---Aquí crearemos las partidas y las distintas pantallas con el menú de inicio---
 
 import pygame as pg
-from the_quest.objetos import Nave, Obstaculo, Balas
+from the_quest.objetos import Explosion, Nave, Obstaculo, Balas
 from the_quest import ANCHO, ALTO, BLANCO, NARANJA, MAGENTA,NEGRO,FPS, FONDO
 from random import random
 
@@ -12,21 +12,33 @@ class Partida:
         pg.display.set_caption("THE QUEST")
 
         self.nave=Nave()
-        self.obstaculo=Obstaculo()
-        self.balas=Balas(75//2,75//2)
 
+        self.grupo_obstaculos = pg.sprite.Group() #creo el grupo obstaculo
+        self.balas=Balas(self.nave.rect.centerx,self.nave.rect.centery)
+        self.all_sprites=pg.sprite.Group()
+
+        self.all_sprites.add(self.nave)  #para actualizar todos los sprites a  la vez
         
-        self.nave.vy=5
-        self.nave.vx=5
+        self.n_vidas=3
 
 
-        #self.fuenteMarcador = pg.font.Font("pong/fonts/silkscreen.ttf", 40)
+        self.fuente_vidas = pg.font.Font("the_quest/fuentes/fast99.ttf", 30)
         #self.fuenteTemporizador = pg.font.Font("pong/fonts/silkscreen.ttf", 20)
 
         self.contadorFotogramas = 0
         self.fondoPantalla = FONDO
 
+        #--Creo 10 objetos obstaculos--
+        for i in range(10):
+            obstaculo=Obstaculo() #creo un objeto obstaculo
+            self.grupo_obstaculos.add(obstaculo) #para comprobar colisiones
+            self.all_sprites.add(obstaculo) #para actualizar todos los sprites a la vez
 
+        #--Creo la lista de explosiones que utilizaré en el metodo update de la clase Explosion---
+        self.lista_explosion=[]
+        for i in range(1,13):
+            explosion = pg.image.load(f'the_quest/imagenes/explosion/{i}.png')
+            self.lista_explosion.append(explosion)
 
     def bucle_ppal(self):
         
@@ -34,9 +46,10 @@ class Partida:
         #self.puntuacion2 = 0
         #self.temporizador = TIEMPO_MAXIMO_PARTIDA
 
+
         game_over = False
         self.metronomo.tick()
-        while not game_over:
+        while not game_over and self.n_vidas > 0:
 
             """""
             and \
@@ -54,27 +67,37 @@ class Partida:
         
             
 
-            self.nave.mover(pg.K_UP, pg.K_DOWN)
-            self.nave.moverlateral(pg.K_LEFT,pg.K_RIGHT)
-            self.obstaculo.actualizar()
+            #self.nave.update(pg.K_UP, pg.K_DOWN)
+            #self.grupo_obstaculos.update()
+            self.all_sprites.update()
             self.balas.actualizar() 
+
+            #-----Colision nave-meteorito----
+            colisiones=pg.sprite.spritecollide(self.nave,self.grupo_obstaculos,True) #comprobamos colision entre nave y alguno de los obstáculos del grupo
+            for colision in colisiones:
+                explosion=Explosion(self.nave.rect.center,self.lista_explosion)
+                self.n_vidas -=1  #reestamos vida
+                obstaculo=Obstaculo()  #creo obstaculo nuevo
+                self.grupo_obstaculos.add(obstaculo) #lo añado al grupo de obstaculos
+                self.all_sprites.add(obstaculo)  #lo añado al grupo all sprites
+                self.all_sprites.add(explosion) #la explosion la añado al grupo all sprites
+
 
 
             self.pantalla_principal.blit(self.fondoPantalla, (0, 0))
     
 
-            self.nave.dibujar(self.pantalla_principal)
-            self.obstaculo.dibujar(self.pantalla_principal)
+            #self.nave.draw(self.pantalla_principal)
+            #self.grupo_obstaculos.draw(self.pantalla_principal)
+            self.all_sprites.draw(self.pantalla_principal)
             self.balas.dibujar(self.pantalla_principal)
 
-            """ 
-            p1 = self.fuenteMarcador.render(str(self.puntuacion1), True, BLANCO)
-            p2 = self.fuenteMarcador.render(str(self.puntuacion2), True, BLANCO)
-            contador = self.fuenteTemporizador.render(str(self.temporizador / 1000), True, BLANCO)
+            vidas = self.fuente_vidas.render(str(self.n_vidas), True, BLANCO)
+            #contador = self.fuenteTemporizador.render(str(self.temporizador / 1000), True, BLANCO)
 
-            self.pantalla_principal.blit(p1,(10,10))
-            self.pantalla_principal.blit(p2, (ANCHO - 45, 10))
-            self.pantalla_principal.blit(contador, (ANCHO // 2, 10)) """
+            self.pantalla_principal.blit(vidas,(10,10))
+            #self.pantalla_principal.blit(p2, (ANCHO - 45, 10))
+            #self.pantalla_principal.blit(contador, (ANCHO // 2, 10))
 
             pg.display.flip()
 
