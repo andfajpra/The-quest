@@ -100,6 +100,7 @@ class Obstaculo(pg.sprite.Sprite):
         self.rect.x=random.randrange(ANCHO + 10, ANCHO + 70)
         self.rect.y=random.randrange(ALTO-self.rect.height)
         self.velocidad_x=random.randrange(pg.time.get_ticks()//5000 + 5) #úmero de pixeles que me voy a desplazar en x
+        self.superado = 0
 
     def draw(self,pantalla):
         pantalla.blit(self.image,(self.rect.x, self.rect.y)) 
@@ -107,12 +108,13 @@ class Obstaculo(pg.sprite.Sprite):
     def update(self):
         #self.velocidad_x=random.randrange(pg.time.get_ticks()//8000 + 1 )#get_ticks tiempo transcurrido desde que iniciamos juego, va aumentando el tiempo
         self.rect.x -= self.velocidad_x
+        self.superado = 0
         #self.rect.x -= self.velocidad_x
         if self.rect.x <=0:  #cuando la poscion de x sea mayor q el ancho de x lo iniciamos de nuevo en cero
             #time.sleep(random.randrange(1, 5))
             self.rect.x=random.randrange(ANCHO + 10, ANCHO + 70)
             self.rect.y=random.randrange(ALTO-self.rect.height)
-
+            self.superado = 1
        
 
     #def disparar_obstaculos
@@ -166,6 +168,13 @@ class Explosion(pg.sprite.Sprite):
                 self.rect=self.image.get_rect()
                 self.rect.center=posicion
 
+        
+class Boton(pg.sprite.Sprite):
+    def __init__(self, x=0, y=0, texto="", ancho=150, alto=50, elevado=6):
+        super().__init__()
+        self.fuente=pg.font.Font("the_quest/fuentes/fast99.ttf",20)
+        self.texto=self.fuente.render(texto, True, "BLANCO")
+        self.rect=self.texto.get_rect()
         
 
 

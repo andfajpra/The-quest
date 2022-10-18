@@ -7,6 +7,8 @@ FONDO= pg.image.load("the_quest/imagenes/fondo.png")
 
 ANCHO = FONDO.get_width()
 ALTO = FONDO.get_height()
+
+#---Crear una ventana---
 VENTANA=pg.display.set_mode((ANCHO, ALTO))
 
 #SONIDO_GOLPE=pygame.mixer.Sound("")
@@ -20,3 +22,16 @@ MAGENTA = (255, 0, 255)
 
 FPS = 60
 CLOCK=pg.time.Clock()
+
+## Definimos indices pantallas
+MENU = 0
+PARTIDA = 1
+INSTRUCCIONES = 2
+PUNTUACIONES = 3
+WIN=4
+GAME_OVER=5
+FIN_JUEGO=6
+
+
+#---Definimos puntuación ganadora y tiempo máximo de partida---
+TIEMPO_MAXIMO_PARTIDA=40
