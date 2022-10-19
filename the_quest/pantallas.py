@@ -3,7 +3,7 @@
 from cmath import rect
 import pygame as pg
 from the_quest.objetos import Explosion, Nave, Obstaculo, Balas
-from the_quest import ANCHO, ALTO, BLANCO, NARANJA, MAGENTA,NEGRO,FPS, FONDO, TIEMPO_MAXIMO_PARTIDA
+from the_quest import ANCHO, ALTO, BLANCO, FONDO_GAME_OVER, FONDO_PLANETA, NARANJA, MAGENTA,NEGRO,FPS, FONDO, TIEMPO_MAXIMO_PARTIDA
 from the_quest import MENU, PARTIDA, INSTRUCCIONES, PUNTUACIONES, WIN, GAME_OVER, FIN_JUEGO
 from random import random
 import pygame.font
@@ -18,7 +18,7 @@ class Partida:
     def __init__(self, pantalla, metronomo):
         self.pantalla_principal = pantalla
         self.metronomo = metronomo
-        pg.display.set_caption("THE QUEST")
+        
 
         self.nave=Nave()
 
@@ -49,6 +49,7 @@ class Partida:
 
     def bucle_ppal(self):
         
+        pg.display.set_caption("THE QUEST")
         self.puntuacion_tiempo = 0
         self.puntuacion_obstaculos = 0
         self.temporizador = 0
@@ -182,12 +183,14 @@ class Instrucciones:
     def __init__(self, pantalla, metronomo):
         self.pantalla_principal = pantalla
         self.metronomo = metronomo
-        pg.display.set_caption("Instrucciones")
+        
         self.imagenFondo= FONDO #pg.image.load("")
         self.fuente_instrucciones= pg.font.Font("the_quest/fuentes/fast99.ttf",20)
         
 
     def bucle_ppal(self):
+        pg.display.set_caption("Instrucciones")
+
         game_over = False
         #self.musica.play(-1)
         
@@ -214,12 +217,14 @@ class Puntuaciones:
     def __init__(self, pantalla, metronomo):
         self.pantalla_principal = pantalla
         self.metronomo = metronomo
-        pg.display.set_caption("Puntuaciones")
+        
         self.imagenFondo= FONDO #pg.image.load("")
         self.fuente_puntuaciones= pg.font.Font("the_quest/fuentes/fast99.ttf",20)
         
 
     def bucle_ppal(self):
+        pg.display.set_caption("Puntuaciones")
+
         game_over = False
         #self.musica.play(-1)
         
@@ -247,12 +252,17 @@ class Win:
     def __init__(self, pantalla, metronomo):
         self.pantalla_principal = pantalla
         self.metronomo = metronomo
-        pg.display.set_caption("WIN")
-        self.imagenFondo= FONDO #pg.image.load("")
+        
+        self.nave=Nave()
+        
+
+        self.imagenFondo= FONDO_PLANETA #pg.image.load("")
+        self.imagenFondo=pg.transform.scale(self.imagenFondo,(ANCHO,ALTO))
         self.fuente_win= pg.font.Font("the_quest/fuentes/fast99.ttf",20)
         
 
     def bucle_ppal(self):
+        pg.display.set_caption("WIN")
         game_over = False
         #self.musica.play(-1)
         
@@ -266,9 +276,13 @@ class Win:
                     if evento.key == pg.K_ESCAPE:
                         return MENU
     
-            
 
+
+            
             self.pantalla_principal.blit(self.imagenFondo, (0, 0))
+            self.nave.draw(self.pantalla_principal)
+            self.nave.mov_lateral()
+            self.nave.rotacion_nave()
             win=self.fuente_win.render("¡¡¡ENHORABUENA!!! HAS GANADO! Pulsa Escape para volver al inicio", True, BLANCO)
             
             self.pantalla_principal.blit(win, (100, 70))
@@ -280,12 +294,17 @@ class Game_over:
     def __init__(self, pantalla, metronomo):
         self.pantalla_principal = pantalla
         self.metronomo = metronomo
-        pg.display.set_caption("GAME OVER")
-        self.imagenFondo= FONDO #pg.image.load("")
-        self.fuente_win= pg.font.Font("the_quest/fuentes/fast99.ttf",20)
         
+        self.imagenFondo= FONDO_GAME_OVER #pg.image.load("")
+        self.imagenFondo=pg.transform.scale(self.imagenFondo,(ANCHO,ALTO))
+        self.fuente_game= pg.font.Font("the_quest/fuentes/fast99.ttf",20)
+        
+    #def draw(self, pantalla):
+
 
     def bucle_ppal(self):
+        pg.display.set_caption("GAME OVER")
+
         game_over = False
         #self.musica.play(-1)
         
@@ -302,9 +321,9 @@ class Game_over:
             
 
             self.pantalla_principal.blit(self.imagenFondo, (0, 0))
-            win=self.fuente_win.render("¡¡¡GAME_OVER!!!  Pulsa Escape para volver al inicio", True, BLANCO)
+            game=self.fuente_game.render("Pulsa Escape para volver al inicio", True, BLANCO)
             
-            self.pantalla_principal.blit(win, (100, 70))
+            self.pantalla_principal.blit(game, (100, 400))
             
             
             pg.display.flip()

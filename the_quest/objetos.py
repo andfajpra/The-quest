@@ -73,22 +73,38 @@ class Nave(pg.sprite.Sprite):
         grupo_balas_jugador.add(bala)
         laser_sonido.play()
 
+    def mov_lateral(self,x_max=600):
+        self.vx=1
+        if self.rect.x < x_max:
+            self.rect.x +=self.vx
+
+    def rotacion_nave(self, x_max=600):
+        self.vx=1
+        if self.rect.x==x_max:
+            self.image=pg.transform.rotate(self.image, 180)
+            self.rect=self.image.get_rect()
+            self.rect.centerx=x_max
+            self.vx=1
+
+
+    
 """
         
-    def moverlateral(self, tecla_izquierda, tecla_derecha, x_max=800):
-        estado_teclas=pg.key.get_pressed()  
-        if estado_teclas[tecla_izquierda]:   
-            self.rectangulo.x -=self.vx
+    def moverlateral(self, #tecla_izquierda, tecla_derecha, x_max=800):
+        #estado_teclas=pg.key.get_pressed()  
+        #if estado_teclas[tecla_izquierda]:   
+            #self.rectangulo.x -=self.vx
 
-        if self.rectangulo.x < 0 + self.ancho //2:    
-            self.rectangulo.x = self.ancho //2
+        #if self.rectangulo.x < 0 + self.ancho //2:    
+            #self.rectangulo.x = self.ancho //2
 
-        if estado_teclas[tecla_derecha]:  
-            self.rectangulo.x += self.vx                               
+        #if estado_teclas[tecla_derecha]:  
+            #self.rectangulo.x += self.vx                               
 
         if self.rectangulo.x > x_max - self.ancho//2:  
             self.rectangulo.x = x_max - self.ancho //2
 """
+  
 
 class Obstaculo(pg.sprite.Sprite):
     def __init__(self):
@@ -164,7 +180,7 @@ class Explosion(pg.sprite.Sprite):
             else:
                 posicion= self.rect.center
                 self.image=self.lista_explosion[self.indice_imagen]
-                self.image=pg.transform.scale(self.image, (15,15))
+                self.image=pg.transform.scale(self.image, (70,70))
                 self.rect=self.image.get_rect()
                 self.rect.center=posicion
 

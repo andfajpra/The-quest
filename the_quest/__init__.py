@@ -4,6 +4,8 @@ pg.init()
 
 
 FONDO= pg.image.load("the_quest/imagenes/fondo.png")
+FONDO_GAME_OVER=pg.image.load("the_quest/imagenes/game_over.png")
+FONDO_PLANETA=pg.image.load("the_quest/imagenes/planeta_1.png")
 
 ANCHO = FONDO.get_width()
 ALTO = FONDO.get_height()
@@ -34,4 +36,4 @@ FIN_JUEGO=6
 
 
 #---Definimos puntuación ganadora y tiempo máximo de partida---
-TIEMPO_MAXIMO_PARTIDA=40
+TIEMPO_MAXIMO_PARTIDA=10
