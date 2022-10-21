@@ -107,7 +107,7 @@ class Nave(pg.sprite.Sprite):
   
 
 class Obstaculo(pg.sprite.Sprite):
-    def __init__(self):
+    def __init__(self,velocidad):
         super().__init__()
         self.image=pg.image.load("the_quest/imagenes/asteroid1.png").convert_alpha()
         tamano_escala=random.randrange(10, self.image.get_width())
@@ -115,7 +115,8 @@ class Obstaculo(pg.sprite.Sprite):
         self.rect=self.image.get_rect()
         self.rect.x=random.randrange(ANCHO + 10, ANCHO + 70)
         self.rect.y=random.randrange(ALTO-self.rect.height)
-        self.velocidad_x=random.randrange(pg.time.get_ticks()//5000 + 5) #úmero de pixeles que me voy a desplazar en x
+        #self.velocidad_x=random.randrange(pg.time.get_ticks()//5000 + 5) #úmero de pixeles que me voy a desplazar en x
+        self.velocidad_x=random.randrange(velocidad[0],velocidad[1])
         self.superado = 0
 
     def draw(self,pantalla):
@@ -131,9 +132,11 @@ class Obstaculo(pg.sprite.Sprite):
             self.rect.x=random.randrange(ANCHO + 10, ANCHO + 70)
             self.rect.y=random.randrange(ALTO-self.rect.height)
             self.superado = 1
-       
+    
+    def cambia_velocidad(self, velocidad):
+        self.velocidad_x=random.randrange(velocidad[0],velocidad[1])
 
-    #def disparar_obstaculos
+    
 
     
 
@@ -155,7 +158,7 @@ class Balas(pg.sprite.Sprite):
             self.kill()   #elimina grupo_jugador creados. elimina los elementos de esa lista.
 
 
-#class Balas_obstaculos(pg.sprite.Sprite):
+
 
 
 class Explosion(pg.sprite.Sprite):
@@ -185,12 +188,7 @@ class Explosion(pg.sprite.Sprite):
                 self.rect.center=posicion
 
         
-class Boton(pg.sprite.Sprite):
-    def __init__(self, x=0, y=0, texto="", ancho=150, alto=50, elevado=6):
-        super().__init__()
-        self.fuente=pg.font.Font("the_quest/fuentes/fast99.ttf",20)
-        self.texto=self.fuente.render(texto, True, "BLANCO")
-        self.rect=self.texto.get_rect()
+
         
 
 

@@ -3,8 +3,9 @@
 from cmath import rect
 import pygame as pg
 from the_quest.objetos import Explosion, Nave, Obstaculo, Balas
-from the_quest import ANCHO, ALTO, BLANCO, FONDO_GAME_OVER, FONDO_PLANETA, NARANJA, MAGENTA,NEGRO,FPS, FONDO, TIEMPO_MAXIMO_PARTIDA
-from the_quest import MENU, PARTIDA, INSTRUCCIONES, PUNTUACIONES, WIN, GAME_OVER, FIN_JUEGO
+#from the_quest import ANCHO, ALTO, BLANCO, FONDO_GAME_OVER, FONDO_PLANETA, NARANJA, MAGENTA,NEGRO,FPS, FONDO, PLANETA, TIEMPO_MAXIMO_PARTIDA
+#from the_quest import MENU, PARTIDA, INSTRUCCIONES, PUNTUACIONES, WIN, GAME_OVER, FIN_JUEGO
+from the_quest import *
 from random import random
 import pygame.font
 from time import time
@@ -19,7 +20,7 @@ class Partida:
         self.pantalla_principal = pantalla
         self.metronomo = metronomo
         
-
+        self.nivel=1
         self.nave=Nave()
 
         self.grupo_obstaculos = pg.sprite.Group() #creo el grupo obstaculo
@@ -29,17 +30,18 @@ class Partida:
         self.all_sprites.add(self.nave)  #para actualizar todos los sprites a  la vez
 
 
+
         self.fuente_vidas = pg.font.Font("the_quest/fuentes/fast99.ttf", 30)
         self.fuenteTemporizador = pg.font.Font("the_quest/fuentes/fast99.ttf", 20)
+        self.fuenteNivel = pg.font.Font("the_quest/fuentes/fast99.ttf", 20)
 
         self.contadorFotogramas = 0
         self.fondoPantalla = FONDO
 
-        #--Creo 10 objetos obstaculos--
-        for i in range(10):
-            obstaculo=Obstaculo() #creo un objeto obstaculo
-            self.grupo_obstaculos.add(obstaculo) #para comprobar colisiones
-            self.all_sprites.add(obstaculo) #para actualizar todos los sprites a la vez
+
+        #--Creo 5 objetos obstaculos para Nivel 1--
+        self.add_obstaculos(4)
+        
 
         #--Creo la lista de explosiones que utilizaré en el metodo update de la clase Explosion---
         self.lista_explosion=[]
@@ -55,17 +57,21 @@ class Partida:
         self.temporizador = 0
         self.t_start = time()
         self.n_vidas = 3
+        
 
+        
 
-
-        #game_over = False
-        #self.metronomo.tick()
+        
+        #----Bucle PARTIDA---:
         while self.n_vidas > 0 and self.temporizador<TIEMPO_MAXIMO_PARTIDA:
 
             salto_tiempo = self.metronomo.tick(FPS) #los milisegundos que han pasado entre frame y frame
             
             # Calculamos el tiempo desde el inicio del bucle principal
             self.temporizador = time() - self.t_start
+
+            #Hacemos el check nivel para ver en que nivel estamos
+            self.check_nivel()
 
 
             for evento in pg.event.get():
@@ -76,8 +82,6 @@ class Partida:
         
             
 
-            #self.nave.update(pg.K_UP, pg.K_DOWN)
-            #self.grupo_obstaculos.update()
             self.all_sprites.update()
             self.balas.actualizar() 
 
@@ -86,7 +90,7 @@ class Partida:
             for colision in colisiones:
                 explosion=Explosion(self.nave.rect.center,self.lista_explosion)
                 self.n_vidas -=1  #reestamos vida
-                obstaculo=Obstaculo()  #creo obstaculo nuevo
+                obstaculo=Obstaculo(VELOCIDAD_NIVEL[self.nivel])  #creo obstaculo nuevo
                 self.grupo_obstaculos.add(obstaculo) #lo añado al grupo de obstaculos
                 self.all_sprites.add(obstaculo)  #lo añado al grupo all sprites
                 self.all_sprites.add(explosion) #la explosion la añado al grupo all sprites
@@ -101,26 +105,67 @@ class Partida:
             self.pantalla_principal.blit(self.fondoPantalla, (0, 0))
     
 
-            #self.nave.draw(self.pantalla_principal)
-            #self.grupo_obstaculos.draw(self.pantalla_principal)
+        
             self.all_sprites.draw(self.pantalla_principal)
             self.balas.dibujar(self.pantalla_principal)
 
-            vidas = self.fuente_vidas.render(str(self.n_vidas), True, BLANCO)
-            contador = self.fuenteTemporizador.render(str(round(self.temporizador, 2)), True, BLANCO)
+            vidas = self.fuente_vidas.render(f'Vidas: {self.n_vidas}', True, BLANCO)
+            contador = self.fuenteTemporizador.render(f'{round(self.temporizador, 2)}', True, BLANCO)
             puntuacion = self.fuenteTemporizador.render(str(self.puntuacion_tiempo + self.puntuacion_obstaculos), True, BLANCO)
+            nivel= self.fuenteNivel.render(f'Nivel: {self.nivel}',True,BLANCO)
 
             self.pantalla_principal.blit(vidas,(10,10))
             self.pantalla_principal.blit(contador, (ANCHO // 2, 10))
             self.pantalla_principal.blit(puntuacion, (ANCHO - 40, 10))
+            self.pantalla_principal.blit(nivel, (ANCHO -100, 30))
 
             pg.display.flip()
 
         if self.n_vidas == 0:
+            print("Entra aqui. vidas:", self.n_vidas)
             return GAME_OVER
         else:
+            print(self.grupo_obstaculos.has())
+            while len(self.grupo_obstaculos.sprites())>1:
+            #---Bucle Final.....
+                self.grupo_obstaculos.update()
+                print(len(self.grupo_obstaculos.sprites()))
+                print(self.grupo_obstaculos.sprites())
+                for obstaculo in self.grupo_obstaculos:
+                    if obstaculo.superado==1:
+                        obstaculo.kill()
+                self.pantalla_principal.blit(self.fondoPantalla, (0, 0))
+                self.all_sprites.draw(self.pantalla_principal)
+                self.pantalla_principal.blit(vidas,(10,10))
+                self.pantalla_principal.blit(contador, (ANCHO // 2, 10))
+                self.pantalla_principal.blit(puntuacion, (ANCHO - 40, 10))
+
+                pg.display.flip()
+            
             return WIN
 
+#--Creo función para añadir obstaculos para cada Nivel--  
+
+    def add_obstaculos(self, n_obstaculos):
+         
+        for i in range(n_obstaculos):
+            obstaculo=Obstaculo(VELOCIDAD_NIVEL[self.nivel]) #creo un objeto obstaculo
+            self.grupo_obstaculos.add(obstaculo) #para comprobar colisiones
+            self.all_sprites.add(obstaculo) #para actualizar todos los sprites a la vez
+
+#----Función para cambiar de nivel en función del tiempo transcurrido---
+    def check_nivel(self):
+        nivel_anterior=self.nivel
+        #el temporizador es el tiempo desde que he iniciado la partida
+        if self.temporizador> TIEMPO_N1:
+            self.nivel=2
+        elif self.temporizador>TIEMPO_N2:
+            self.nivel=3
+        
+        if nivel_anterior != self.nivel:
+            for obstaculo in self.grupo_obstaculos:
+                obstaculo.cambia_velocidad(VELOCIDAD_NIVEL[self.nivel])
+            self.add_obstaculos(2)
 
 class Menu:
     def __init__(self, pantalla, metronomo):
@@ -155,6 +200,7 @@ class Menu:
                         return INSTRUCCIONES
                     if evento.key == pg.K_p:
                         return PUNTUACIONES
+
                     
 
             self.pantalla_principal.blit(self.imagenFondo, (0, 0))
@@ -256,9 +302,12 @@ class Win:
         self.nave=Nave()
         
 
-        self.imagenFondo= FONDO_PLANETA #pg.image.load("")
-        self.imagenFondo=pg.transform.scale(self.imagenFondo,(ANCHO,ALTO))
+        self.imagenFondo= FONDO #pg.image.load("")
+        #self.imagenFondo=pg.transform.scale(self.imagenFondo,(ANCHO,ALTO))
         self.fuente_win= pg.font.Font("the_quest/fuentes/fast99.ttf",20)
+
+       
+
         
 
     def bucle_ppal(self):
@@ -280,15 +329,15 @@ class Win:
 
             
             self.pantalla_principal.blit(self.imagenFondo, (0, 0))
-            self.nave.draw(self.pantalla_principal)
-            self.nave.mov_lateral()
-            self.nave.rotacion_nave()
+         
+           
             win=self.fuente_win.render("¡¡¡ENHORABUENA!!! HAS GANADO! Pulsa Escape para volver al inicio", True, BLANCO)
             
             self.pantalla_principal.blit(win, (100, 70))
             
             
             pg.display.flip()
+
 
 class Game_over:
     def __init__(self, pantalla, metronomo):

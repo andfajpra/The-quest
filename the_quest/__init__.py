@@ -1,11 +1,13 @@
 #----Aquí vamos a ir metiendo toda la configuración...
 import pygame as pg
+
 pg.init()
 
 
 FONDO= pg.image.load("the_quest/imagenes/fondo.png")
 FONDO_GAME_OVER=pg.image.load("the_quest/imagenes/game_over.png")
 FONDO_PLANETA=pg.image.load("the_quest/imagenes/planeta_1.png")
+PLANETA=pg.image.load("the_quest/imagenes/planeta2.png")
 
 ANCHO = FONDO.get_width()
 ALTO = FONDO.get_height()
@@ -34,6 +36,21 @@ WIN=4
 GAME_OVER=5
 FIN_JUEGO=6
 
+##Definimos velocidades de nivel
+VELOCIDAD_NIVEL= {
+    1: [2,4],
+    2: [4,6],
+    3: [6,8] 
+}
 
-#---Definimos puntuación ganadora y tiempo máximo de partida---
-TIEMPO_MAXIMO_PARTIDA=10
+
+
+#Tiempo de nivel
+TIEMPO_N1 = 5
+TIEMPO_N2 = 10
+
+
+
+
+#---Definimos tiempo máximo de partida---
+TIEMPO_MAXIMO_PARTIDA=25
