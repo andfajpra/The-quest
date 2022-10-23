@@ -27,8 +27,11 @@ class Nave(pg.sprite.Sprite):
         self.vx = 5
         self.vy = 5
 
-        
 
+        #Vbles para rotación
+        self.rotando=False
+        self.angulo=0        
+        self.imagen_rotacion=pg.image.load("the_quest/imagenes/craft.png").convert_alpha()
 
     
     def draw(self,pantalla):
@@ -77,14 +80,30 @@ class Nave(pg.sprite.Sprite):
         self.vx=1
         if self.rect.x < x_max:
             self.rect.x +=self.vx
+        else:
+            self.rotacion_nave()
 
-    def rotacion_nave(self, x_max=600):
-        self.vx=1
-        if self.rect.x==x_max:
-            self.image=pg.transform.rotate(self.image, 180)
-            self.rect=self.image.get_rect()
-            self.rect.centerx=x_max
-            self.vx=1
+
+    def rotacion_nave(self):
+        
+        print("rotando",self.rotando)
+        print("angulo", self.angulo)
+        if self.rotando: #si rotando es igual a True
+            self.angulo += 1
+            angulo_rotacion=(self.angulo)/2
+            self.image=pg.transform.rotate(self.imagen_rotacion, angulo_rotacion)
+        
+            if angulo_rotacion==180:
+                self.rotando=False
+        
+        #rect= self.image.get_rect()
+        #centrox=rect.centerx
+        #centroy=rect.centery
+        #dx=centrox-self.ancho//2
+        #dy=centroy-self.alto//2
+        
+
+        
 
 
     

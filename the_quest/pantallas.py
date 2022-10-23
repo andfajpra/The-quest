@@ -126,9 +126,11 @@ class Partida:
             return GAME_OVER
         else:
             print(self.grupo_obstaculos.has())
-            while len(self.grupo_obstaculos.sprites())>1:
+            self.nave.rotando=True
+            while len(self.grupo_obstaculos.sprites())>1 or self.nave.rotando==True:
             #---Bucle Final.....
                 self.grupo_obstaculos.update()
+                self.nave.mov_lateral()
                 print(len(self.grupo_obstaculos.sprites()))
                 print(self.grupo_obstaculos.sprites())
                 for obstaculo in self.grupo_obstaculos:
@@ -141,6 +143,7 @@ class Partida:
                 self.pantalla_principal.blit(puntuacion, (ANCHO - 40, 10))
 
                 pg.display.flip()
+
             
             return WIN
 
