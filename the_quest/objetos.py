@@ -1,9 +1,11 @@
 #---Aquí creamos los objetos que aparecerán en el juego---
+from genericpath import exists
 import random
 from re import X
 import time
 import pygame as pg
-from the_quest import ANCHO, ALTO
+from the_quest import ANCHO, ALTO, PUNTUACIONES
+import sqlite3
 
 class Nave(pg.sprite.Sprite):
     
@@ -96,11 +98,7 @@ class Nave(pg.sprite.Sprite):
             if angulo_rotacion==180:
                 self.rotando=False
         
-        #rect= self.image.get_rect()
-        #centrox=rect.centerx
-        #centroy=rect.centery
-        #dx=centrox-self.ancho//2
-        #dy=centroy-self.alto//2
+       
         
 
         
@@ -210,10 +208,44 @@ class Explosion(pg.sprite.Sprite):
 
         
 
+class Bbdd():
+    #Creamos BBDD y tabla
+    def __init__(self):
+        self.con=sqlite3.connect("the_quest/bbdd/records.db")
+        self.cur=self.con.cursor()
+        self.cur.execute('''CREATE TABLE if not exists "records" (
+	                     "iniciales"	TEXT NOT NULL,
+	                     "puntuaciones"	INTEGER
+                         )''')
+        self.con.commit()
+        
 
 
+    #Creamos consulta en orden 3 primeras puntuaciones
+    def select(self):
+        
+        consulta= 'SELECT * FROM records order by puntuaciones DESC limit 3'
+        
+        self.cur.execute(consulta)
+        datos=self.cur.fetchall()
+
+        return datos
+    
+    #Función para insertar puntuación
+
+    def inserta_puntuacion(self, puntuaciones, iniciales):
+
+        consulta=f'insert into records (iniciales, puntuaciones) values ("{iniciales}", "{puntuaciones}")'
+        self.cur.execute(consulta)
+        self.con.commit()
 
 
+    def cerrar_conexion(self):
+
+        if self.cur:
+            self.cur.close()
+        if self.con:
+            self.con.close()
 
 
 

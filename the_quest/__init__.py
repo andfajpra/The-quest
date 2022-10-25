@@ -53,4 +53,4 @@ TIEMPO_N2 = 10
 
 
 #---Definimos tiempo máximo de partida---
-TIEMPO_MAXIMO_PARTIDA=25
+TIEMPO_MAXIMO_PARTIDA=10

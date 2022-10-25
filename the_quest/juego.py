@@ -25,7 +25,8 @@ class Controlador:
             while siguiente_pantalla != FIN_JUEGO:
             #while bool(salida) == False:
                 siguiente_pantalla = self.pantalla.bucle_ppal()
-                self.pantalla = self.pantallas[siguiente_pantalla]
+                if siguiente_pantalla != FIN_JUEGO:
+                    self.pantalla = self.pantallas[siguiente_pantalla]
                 #ix = (ix + 1) % len(self.pantallas) 
                 
       

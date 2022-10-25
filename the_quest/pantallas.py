@@ -2,7 +2,7 @@
 
 from cmath import rect
 import pygame as pg
-from the_quest.objetos import Explosion, Nave, Obstaculo, Balas
+from the_quest.objetos import Bbdd, Explosion, Nave, Obstaculo, Balas
 #from the_quest import ANCHO, ALTO, BLANCO, FONDO_GAME_OVER, FONDO_PLANETA, NARANJA, MAGENTA,NEGRO,FPS, FONDO, PLANETA, TIEMPO_MAXIMO_PARTIDA
 #from the_quest import MENU, PARTIDA, INSTRUCCIONES, PUNTUACIONES, WIN, GAME_OVER, FIN_JUEGO
 from the_quest import *
@@ -19,28 +19,12 @@ class Partida:
     def __init__(self, pantalla, metronomo):
         self.pantalla_principal = pantalla
         self.metronomo = metronomo
-        
-        self.nivel=1
-        self.nave=Nave()
-
-        self.grupo_obstaculos = pg.sprite.Group() #creo el grupo obstaculo
-        self.balas=Balas(self.nave.rect.centerx,self.nave.rect.centery)
-        self.all_sprites=pg.sprite.Group()
-
-        self.all_sprites.add(self.nave)  #para actualizar todos los sprites a  la vez
-
 
 
         self.fuente_vidas = pg.font.Font("the_quest/fuentes/fast99.ttf", 30)
         self.fuenteTemporizador = pg.font.Font("the_quest/fuentes/fast99.ttf", 20)
         self.fuenteNivel = pg.font.Font("the_quest/fuentes/fast99.ttf", 20)
-
-        self.contadorFotogramas = 0
         self.fondoPantalla = FONDO
-
-
-        #--Creo 5 objetos obstaculos para Nivel 1--
-        self.add_obstaculos(4)
         
 
         #--Creo la lista de explosiones que utilizaré en el metodo update de la clase Explosion---
@@ -52,14 +36,26 @@ class Partida:
     def bucle_ppal(self):
         
         pg.display.set_caption("THE QUEST")
+
+        self.nivel=1
+        self.nave=Nave()
+
+        self.grupo_obstaculos = pg.sprite.Group() #creo el grupo obstaculo
+        self.balas=Balas(self.nave.rect.centerx,self.nave.rect.centery)
+        self.all_sprites=pg.sprite.Group()
+
+        self.all_sprites.add(self.nave)  #para actualizar todos los sprites a  la vez
+
+        #--Creo 5 objetos obstaculos para Nivel 1--
+        self.add_obstaculos(4)
+
+        self.contadorFotogramas = 0
         self.puntuacion_tiempo = 0
         self.puntuacion_obstaculos = 0
         self.temporizador = 0
         self.t_start = time()
         self.n_vidas = 3
-        
-
-        
+        self.bbdd=Bbdd()
 
         
         #----Bucle PARTIDA---:
@@ -77,10 +73,8 @@ class Partida:
             for evento in pg.event.get():
                 if evento.type == pg.QUIT: #pg.QUIT es cuando le damos a la x de la ventana
                     #return True
+                    self.bbdd.cerrar_conexion()
                     return FIN_JUEGO
-        
-        
-            
 
             self.all_sprites.update()
             self.balas.actualizar() 
@@ -103,8 +97,6 @@ class Partida:
 
 
             self.pantalla_principal.blit(self.fondoPantalla, (0, 0))
-    
-
         
             self.all_sprites.draw(self.pantalla_principal)
             self.balas.dibujar(self.pantalla_principal)
@@ -123,6 +115,11 @@ class Partida:
 
         if self.n_vidas == 0:
             print("Entra aqui. vidas:", self.n_vidas)
+            if self.comprueba_puntuacion() ==1:
+                iniciales = self.get_iniciales()
+                self.bbdd.inserta_puntuacion(self.puntuacionfinal,iniciales)
+                #self.muestra_puntuacion()
+            self.bbdd.cerrar_conexion()
             return GAME_OVER
         else:
             print(self.grupo_obstaculos.has())
@@ -145,7 +142,111 @@ class Partida:
                 pg.display.flip()
 
             
+            if self.comprueba_puntuacion() == 1:
+                iniciales = self.get_iniciales()
+                self.bbdd.inserta_puntuacion(self.puntuacionfinal,iniciales)
+                self.muestra_puntuacion()
+            
+            self.bbdd.cerrar_conexion()
+
             return WIN
+
+    def comprueba_puntuacion(self):
+        #---Comprobamos puntuaciones
+        self.puntuacionfinal=self.puntuacion_obstaculos + self.puntuacion_tiempo #mi puntuacion es la suma de estas dos
+
+        mejores3=self.bbdd.select() #ejecutamos consulta creada select
+
+        if len(mejores3)==0: #si la longitud es cero
+            return 1   #la mía será mejor
+
+        es_mejor = 0 #bandera
+        
+        for i, p in mejores3:  #la consulta me da una lista de tuplas con iniciales (i) y puntuaciones (p)
+            if self.puntuacionfinal >= p: #si mi puntuacion final es mejor que alguna de las p anteriores
+                es_mejor = 1            #la bandera se pone a 1
+                break
+
+        return es_mejor
+
+
+    def get_iniciales(self):
+        
+        casilla_iniciales = pg.Rect(100, 100, 140, 32)
+        iniciales = ''
+        fin_iniciales = False
+
+        while not fin_iniciales:
+            for event in pg.event.get():
+                if event.type == pg.QUIT:
+                    self.bbdd.cerrar_conexion()
+                    return FIN_JUEGO
+                if event.type == pg.KEYDOWN:
+                    if event.key == pg.K_RETURN:
+                        print(iniciales)
+                        fin_iniciales = True
+                    elif event.key == pg.K_BACKSPACE:
+                        iniciales = iniciales[:-1]
+                    else:
+                        iniciales += event.unicode
+
+            self.pantalla_principal.blit(self.fondoPantalla, (0, 0))
+            # Render the current text.
+            texto_iniciales = self.fuente_vidas.render(f'Introduce tus iniciales: {iniciales}', True, BLANCO)
+            # Resize the box if the text is too long.
+            width = max(200, texto_iniciales.get_width()+10)
+            casilla_iniciales.w = width
+            # Blit the text.
+            self.pantalla_principal.blit(texto_iniciales, (casilla_iniciales.x+5, casilla_iniciales.y+5))
+            # Blit the input_box rect.
+            #pg.draw.rect(screen, color, input_box, 2)
+
+            pg.display.flip()
+        
+        return iniciales
+            
+            
+    def muestra_puntuacion(self):
+
+        mejores3=self.bbdd.select() #ejecutamos consulta creada select
+
+       
+        fin_iniciales = False
+
+        while not fin_iniciales:
+            for event in pg.event.get():
+                if event.type == pg.QUIT:
+                    self.bbdd.cerrar_conexion()
+                    return FIN_JUEGO
+                if event.type == pg.KEYDOWN:
+                    if event.key == pg.K_p:
+                        fin_iniciales = True
+                    
+
+            self.pantalla_principal.blit(self.fondoPantalla, (0, 0))
+
+            iniciales = self.fuente_vidas.render("INICIALES", True, BLANCO)
+            puntuaciones = self.fuenteTemporizador.render("PUNTUACIONES", True, BLANCO)
+        
+            y = 10
+            self.pantalla_principal.blit(iniciales,(10,y))
+            self.pantalla_principal.blit(puntuaciones, (ANCHO // 2, y))
+
+            for i,p in mejores3:
+                y += 30
+                iniciales = self.fuente_vidas.render(i, True, BLANCO)
+                puntuaciones = self.fuenteTemporizador.render(str(p), True, BLANCO)
+            
+                self.pantalla_principal.blit(iniciales,(10,y))
+                self.pantalla_principal.blit(puntuaciones, (ANCHO // 2, y))
+            
+
+            pg.display.flip()
+
+
+            
+
+        
 
 #--Creo función para añadir obstaculos para cada Nivel--  
 
@@ -267,9 +368,11 @@ class Puntuaciones:
         self.pantalla_principal = pantalla
         self.metronomo = metronomo
         
+
         self.imagenFondo= FONDO #pg.image.load("")
         self.fuente_puntuaciones= pg.font.Font("the_quest/fuentes/fast99.ttf",20)
-        
+       
+
 
     def bucle_ppal(self):
         pg.display.set_caption("Puntuaciones")
@@ -282,27 +385,28 @@ class Puntuaciones:
                 if evento.type == pg.QUIT:
                     return FIN_JUEGO
 
-                
+                    
                 if evento.type == pg.KEYDOWN: 
                     if evento.key == pg.K_ESCAPE:
                         return MENU
-    
+                   
             
-
+            
             self.pantalla_principal.blit(self.imagenFondo, (0, 0))
+
             puntuaciones=self.fuente_puntuaciones.render("Puntuaciones:", True, BLANCO)
             
-            self.pantalla_principal.blit(puntuaciones, (100, 70))
             
+            self.pantalla_principal.blit(puntuaciones, (100, 70))
+           
             
             pg.display.flip()
 
 class Win:
     def __init__(self, pantalla, metronomo):
+        
         self.pantalla_principal = pantalla
         self.metronomo = metronomo
-        
-        self.nave=Nave()
         
 
         self.imagenFondo= FONDO #pg.image.load("")
@@ -332,7 +436,6 @@ class Win:
 
             
             self.pantalla_principal.blit(self.imagenFondo, (0, 0))
-         
            
             win=self.fuente_win.render("¡¡¡ENHORABUENA!!! HAS GANADO! Pulsa Escape para volver al inicio", True, BLANCO)
             
