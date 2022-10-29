@@ -4,7 +4,7 @@ import random
 from re import X
 import time
 import pygame as pg
-from the_quest import ANCHO, ALTO, PLANETA, PUNTUACIONES
+from the_quest import ANCHO, ALTO, PLANETA, PUNTUACIONES,NEGRO
 import sqlite3
 
 class Nave(pg.sprite.Sprite):
@@ -14,6 +14,7 @@ class Nave(pg.sprite.Sprite):
         super().__init__()
         self.image=pg.image.load("the_quest/imagenes/craft4.png").convert_alpha()#lo convertimos a alpha para eliminar el fondo
         self.image=pg.transform.scale(self.image,(75,75))
+        
         pg.display.set_icon(self.image) #esto es para colocar esta misma imagen como icono del juego
         self.rect=self.image.get_rect() #Vamos a posicionar el rectángulo que utiliza la imagen
 
@@ -206,7 +207,8 @@ class Planeta(pg.sprite.Sprite):
     def __init__(self):
         super().__init__()
         self.image=PLANETA.convert_alpha()#lo convertimos a alpha para eliminar el fondo
-        self.image=pg.transform.scale(self.image,(200,200))
+        self.image=pg.transform.scale(self.image,(300,750))
+        
         
         self.rect=self.image.get_rect() #Vamos a posicionar el rectángulo que utiliza la imagen
 

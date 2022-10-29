@@ -7,9 +7,10 @@ pg.init()
 FUENTE_PRINCIPAL=pg.font.Font("the_quest/fuentes/Starjedi.ttf", 20)
 
 FONDO= pg.image.load("the_quest/imagenes/fondo.png")
+FONDO_MENU=pg.image.load("the_quest/imagenes/fondomenu.jpg")
 FONDO_GAME_OVER=pg.image.load("the_quest/imagenes/game_over.png")
-FONDO_PLANETA=pg.image.load("the_quest/imagenes/planeta_1.png")
-PLANETA=pg.image.load("the_quest/imagenes/planeta2.png")
+#FONDO_PLANETA=pg.image.load("the_quest/imagenes/planeta2.png")
+PLANETA=pg.image.load("the_quest/imagenes/planeta3.png")
 
 EXPLOSION_SONIDO=pg.mixer.Sound("the_quest/sonidos/explosion.wav")
 
