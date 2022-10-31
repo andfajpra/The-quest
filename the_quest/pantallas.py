@@ -141,25 +141,23 @@ class Partida:
                 self.x2 = self.x1 + ANCHO
 
         if self.n_vidas == 0:
-            print("Entra aqui. vidas:", self.n_vidas)
+            self.musica.stop()
             if self.comprueba_puntuacion() ==1:
                 iniciales = self.get_iniciales()
                 self.bbdd.inserta_puntuacion(self.puntuacionfinal,iniciales)
                 
             self.bbdd.cerrar_conexion()
-            self.musica.stop()
+            
             return GAME_OVER
         else:
             self.planeta_final=Planeta()
-            print(self.grupo_obstaculos.has())
+            
             self.nave.rotando=True
             while len(self.grupo_obstaculos.sprites())>1 or self.nave.ancho>1:
             #---Bucle Final.....
                 self.grupo_obstaculos.update()
                 self.nave.mov_lateral()
                 self.planeta_final.update()
-                print(len(self.grupo_obstaculos.sprites()))
-                print(self.grupo_obstaculos.sprites())
                 for obstaculo in self.grupo_obstaculos:
                     if obstaculo.superado==1:
                         obstaculo.kill()
@@ -171,11 +169,11 @@ class Partida:
                 self.pantalla_principal.blit(vidas,(10,10))
                 self.pantalla_principal.blit(contador, (ANCHO // 2, 10))
                 self.pantalla_principal.blit(puntuacion, (ANCHO - 40, 10))
-                self.musica.stop()
+                
 
                 pg.display.flip()
 
-            
+            self.musica.stop()
             if self.comprueba_puntuacion() == 1:
                 iniciales = self.get_iniciales()
                 self.bbdd.inserta_puntuacion(self.puntuacionfinal,iniciales)
@@ -183,7 +181,6 @@ class Partida:
                 punt.bucle_ppal()
             
             self.bbdd.cerrar_conexion()
-            self.musica.stop()
 
             return WIN
 
@@ -222,7 +219,6 @@ class Partida:
                     return FIN_JUEGO
                 if event.type == pg.KEYDOWN:
                     if event.key == pg.K_RETURN:
-                        print(iniciales)
                         fin_iniciales = True
                     elif event.key == pg.K_BACKSPACE:
                         iniciales = iniciales[:-1]
