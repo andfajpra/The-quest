@@ -6,6 +6,7 @@ import time
 import pygame as pg
 from the_quest import ANCHO, ALTO, PLANETA, PUNTUACIONES,NEGRO
 import sqlite3
+import os
 
 class Nave(pg.sprite.Sprite):
     
@@ -209,6 +210,8 @@ class Planeta(pg.sprite.Sprite):
 class Bbdd():
     #Creamos BBDD y tabla
     def __init__(self):
+        os.makedirs("the_quest/bbdd", exist_ok=True)
+
         self.con=sqlite3.connect("the_quest/bbdd/records.db")
         self.cur=self.con.cursor()
         self.cur.execute('''CREATE TABLE if not exists "records" (
