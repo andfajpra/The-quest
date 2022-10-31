@@ -30,6 +30,7 @@ ROJO = (255, 0 ,0)
 MAGENTA = (255, 0, 255)
 
 FPS = 60
+FPS2=90
 CLOCK=pg.time.Clock()
 
 ## Definimos indices pantallas

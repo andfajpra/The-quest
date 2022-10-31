@@ -92,8 +92,6 @@ class Nave(pg.sprite.Sprite):
 
     def rotacion_nave(self):
         
-        print("rotando",self.rotando)
-        print("angulo", self.angulo)
         old_center = self.rect.center
 
         if self.rotando: #si rotando es igual a True

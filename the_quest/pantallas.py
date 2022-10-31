@@ -155,6 +155,8 @@ class Partida:
             self.nave.rotando=True
             while len(self.grupo_obstaculos.sprites())>1 or self.nave.ancho>1:
             #---Bucle Final.....
+                salto_tiempo = self.metronomo.tick(FPS2)
+
                 self.grupo_obstaculos.update()
                 self.nave.mov_lateral()
                 self.planeta_final.update()
@@ -327,7 +329,7 @@ class Menu:
             self.pantalla_principal.blit(puntuaciones, (400, ALTO -300))
             pg.display.flip()
 
-        #self.musica.stop()
+        
 
 
 class Instrucciones:
@@ -525,4 +527,4 @@ class Game_over:
             
             pg.display.flip()
         
-        #self.sonido.stop()
+        
