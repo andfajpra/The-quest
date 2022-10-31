@@ -1,5 +1,5 @@
 #----Aquí vamos a ir metiendo toda la configuración...
-from ctypes.wintypes import SIZE
+
 import pygame as pg
 
 pg.init()
