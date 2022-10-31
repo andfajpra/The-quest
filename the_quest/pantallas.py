@@ -6,9 +6,8 @@
 from cmath import rect
 from email.errors import MultipartInvariantViolationDefect
 import pygame as pg
-from the_quest.objetos import Bbdd, Explosion, Nave, Obstaculo, Balas, Planeta
-#from the_quest import ANCHO, ALTO, BLANCO, FONDO_GAME_OVER, FONDO_PLANETA, NARANJA, MAGENTA,NEGRO,FPS, FONDO, PLANETA, TIEMPO_MAXIMO_PARTIDA
-#from the_quest import MENU, PARTIDA, INSTRUCCIONES, PUNTUACIONES, WIN, GAME_OVER, FIN_JUEGO
+from the_quest.objetos import Bbdd, Explosion, Nave, Obstaculo, Planeta
+
 from the_quest import *
 from random import random
 import pygame.font
@@ -53,7 +52,7 @@ class Partida:
         self.nave=Nave()
 
         self.grupo_obstaculos = pg.sprite.Group() #creo el grupo obstaculo
-        self.balas=Balas(self.nave.rect.centerx,self.nave.rect.centery)
+        
         self.all_sprites=pg.sprite.Group()
 
         self.all_sprites.add(self.nave)  #para actualizar todos los sprites a  la vez
@@ -69,7 +68,8 @@ class Partida:
         self.n_vidas = 3
         self.bbdd=Bbdd()
 
-        self.movfondo=0
+        self.x1=0  #coordenada x de la primera imagen fondo
+        self.x2=ANCHO #coordenada x de la segunda imagen fondo
 
         self.musica.play(-1)
         
@@ -93,7 +93,7 @@ class Partida:
                     return FIN_JUEGO
 
             self.all_sprites.update()
-            self.balas.actualizar() 
+            
 
             #-----Colision nave-meteorito----
             colisiones=pg.sprite.spritecollide(self.nave,self.grupo_obstaculos,True) #comprobamos colision entre nave y alguno de los obstáculos del grupo
@@ -114,11 +114,11 @@ class Partida:
                 self.puntuacion_obstaculos += 10 * obstaculo.superado
 
             #pintamos fondo
-            self.pantalla_principal.blit(self.fondoPantalla, (self.movfondo, 0))
-            self.pantalla_principal.blit(self.fondoPantalla2,(ANCHO+self.movfondo,0))
+            self.pantalla_principal.blit(self.fondoPantalla, (self.x1, 0))
+            self.pantalla_principal.blit(self.fondoPantalla2,(self.x2,0))
         
             self.all_sprites.draw(self.pantalla_principal)
-            self.balas.dibujar(self.pantalla_principal)
+           
 
             vidas = self.fuente_vidas.render(f'Vidas: {self.n_vidas}', True, BLANCO)
             contador = self.fuenteTemporizador.render(f'{round(self.temporizador, 2)}', True, BLANCO)
@@ -132,7 +132,13 @@ class Partida:
 
             pg.display.flip()
 
-            self.movfondo -=0.4
+            self.x1 -=0.4
+            self.x2 -=0.4
+
+            if self.x1 <= -ANCHO:
+                self.x1 = self.x2 + ANCHO
+            if self.x2 <= -ANCHO:
+                self.x2 = self.x1 + ANCHO
 
         if self.n_vidas == 0:
             print("Entra aqui. vidas:", self.n_vidas)
@@ -141,6 +147,7 @@ class Partida:
                 self.bbdd.inserta_puntuacion(self.puntuacionfinal,iniciales)
                 
             self.bbdd.cerrar_conexion()
+            self.musica.stop()
             return GAME_OVER
         else:
             self.planeta_final=Planeta()
@@ -157,8 +164,8 @@ class Partida:
                     if obstaculo.superado==1:
                         obstaculo.kill()
                 
-                self.pantalla_principal.blit(self.fondoPantalla, (self.movfondo, 0))
-                self.pantalla_principal.blit(self.fondoPantalla2,(ANCHO+self.movfondo,0))
+                self.pantalla_principal.blit(self.fondoPantalla, (self.x1, 0))
+                self.pantalla_principal.blit(self.fondoPantalla2,(self.x2,0))
                 self.planeta_final.draw(self.pantalla_principal)
                 self.all_sprites.draw(self.pantalla_principal)
                 self.pantalla_principal.blit(vidas,(10,10))
@@ -176,6 +183,7 @@ class Partida:
                 punt.bucle_ppal()
             
             self.bbdd.cerrar_conexion()
+            self.musica.stop()
 
             return WIN
 
@@ -223,14 +231,15 @@ class Partida:
                             iniciales += event.unicode
 
             
-            self.pantalla_principal.blit(self.fondoPantalla, (self.movfondo, 0))
-            self.pantalla_principal.blit(self.fondoPantalla2,(ANCHO+self.movfondo,0))
-            # Render the current text.
+            self.pantalla_principal.blit(self.fondoPantalla, (self.x1, 0))
+            self.pantalla_principal.blit(self.fondoPantalla2,(self.x2,0))
+            
             texto_iniciales = self.fuente_vidas.render(f'Introduce tus iniciales: {iniciales}', True, BLANCO)
-            # Resize the box if the text is too long.
+            
             width = max(200, texto_iniciales.get_width()+10)
             casilla_iniciales.w = width
-            # Blit the text.
+            
+
             self.pantalla_principal.blit(texto_iniciales, (casilla_iniciales.x+5, casilla_iniciales.y+5))
             
 
@@ -333,7 +342,7 @@ class Instrucciones:
         self.imagenFondo= FONDO #pg.image.load("")
         self.fuente_instrucciones= pg.font.Font("the_quest/fuentes/fast99.ttf",40)
         self.fuente_escape= pg.font.Font("the_quest/fuentes/fast99.ttf",10)
-        self.fuente_texto_instrucciones=pg.font.Font("the_quest/fuentes/Starjedi.ttf",25)
+        self.fuente_texto_instrucciones=pg.font.Font("the_quest/fuentes/Starjedi.ttf",15)
         
 
     def bucle_ppal(self):
@@ -489,7 +498,7 @@ class Game_over:
         self.imagenFondo=pg.transform.scale(self.imagenFondo,(ANCHO,ALTO))
         self.fuente_game= pg.font.Font("the_quest/fuentes/fast99.ttf",20)
         self.sonido=pg.mixer.Sound("the_quest/sonidos/gameover.mp3")
-    #def draw(self, pantalla):
+    
 
 
     def bucle_ppal(self):

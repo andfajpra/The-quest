@@ -74,11 +74,7 @@ class Nave(pg.sprite.Sprite):
 
         
 
-    def disparar(self):
-        bala=Balas(self.rect.centery,self.rect.right) #esto es un objeto de la clase Balas que creamos abajo. Le pasamos coordenadas.
-        grupo_jugador.add(bala)
-        grupo_balas_jugador.add(bala)
-        laser_sonido.play()
+    
 
     def mov_lateral(self,x_max=630):
         self.vx=1
@@ -141,8 +137,8 @@ class Obstaculo(pg.sprite.Sprite):
         self.rect.x -= self.velocidad_x
         self.superado = 0
         #self.rect.x -= self.velocidad_x
-        if self.rect.x <=0:  #cuando la poscion de x sea mayor q el ancho de x lo iniciamos de nuevo en cero
-            #time.sleep(random.randrange(1, 5))
+        if self.rect.x <=-self.rect.width:  #cuando la poscion de x sea mayor q el ancho de x lo iniciamos de nuevo en cero
+            
             self.rect.x=random.randrange(ANCHO + 10, ANCHO + 70)
             self.rect.y=random.randrange(ALTO-self.rect.height)
             self.superado = 1
@@ -152,24 +148,6 @@ class Obstaculo(pg.sprite.Sprite):
 
     
 
-    
-
-class Balas(pg.sprite.Sprite):
-    def __init__(self,x,y):
-        super().__init__()
-        self.imagen = pg.image.load("the_quest/imagenes/explosion1.png").convert_alpha()
-        self.rectangulo=self.imagen.get_rect()
-        self.rectangulo.x=x
-        self.rectangulo.y=y
-        self.velocidad= 18
-
-    def dibujar(self,pantalla):
-        pantalla.blit(self.imagen,(self.rectangulo.x, self.rectangulo.y)) 
-
-    def actualizar(self):
-        self.rectangulo.x += self.velocidad
-        if self.rectangulo.right >835:
-            self.kill()   #elimina grupo_jugador creados. elimina los elementos de esa lista.
 
 
 

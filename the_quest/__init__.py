@@ -9,7 +9,7 @@ FUENTE_PRINCIPAL=pg.font.Font("the_quest/fuentes/Starjedi.ttf", 20)
 FONDO= pg.image.load("the_quest/imagenes/fondo.png")
 FONDO_MENU=pg.image.load("the_quest/imagenes/fondomenu.jpg")
 FONDO_GAME_OVER=pg.image.load("the_quest/imagenes/game_over.png")
-#FONDO_PLANETA=pg.image.load("the_quest/imagenes/planeta2.png")
+
 PLANETA=pg.image.load("the_quest/imagenes/planeta3.png")
 
 EXPLOSION_SONIDO=pg.mixer.Sound("the_quest/sonidos/explosion.wav")
@@ -20,7 +20,7 @@ ALTO = FONDO.get_height()
 #---Crear una ventana---
 VENTANA=pg.display.set_mode((ANCHO, ALTO))
 
-#SONIDO_GOLPE=pygame.mixer.Sound("")
+
 
 BLANCO = (255, 255, 255)
 NEGRO = (0 ,0 ,0)
@@ -51,11 +51,11 @@ VELOCIDAD_NIVEL= {
 
 
 #Tiempo de nivel
-TIEMPO_N1 = 5
-TIEMPO_N2 = 10
+TIEMPO_N1 = 20
+TIEMPO_N2 = 40
 
 
 
 
 #---Definimos tiempo máximo de partida---
-TIEMPO_MAXIMO_PARTIDA=10
+TIEMPO_MAXIMO_PARTIDA=60
